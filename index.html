@@ -396,7 +396,6 @@
   .previsao{border-left:5px solid #2563EB;background:#EFF6FF;}
   .previsao .v{color:#1E3A8A;font-weight:600;}
 
-  /* ---------- CRÉDITOS APROVADOS ---------- */
   .creditos{
     margin-top:16px;border-radius:14px;padding:18px 20px;
     background:#FFF5F5;border:1px solid #FECACA;
@@ -425,7 +424,6 @@
   }
   .credito .v.zero{color:#94A3B8;font-weight:700;font-size:1.15rem;}
 
-  /* ---------- CUSTO DOCUMENTAÇÃO ---------- */
   .custo-doc{
     margin-top:16px;
     border-radius:14px;
@@ -542,7 +540,14 @@ const FLUXO_RECUSADO = [
 ];
 
 /* =========================================================
-   2) BASE DE DADOS
+   2) BASE DE DADOS — ATUALIZADA
+   ---------------------------------------------------------
+   Mudança nesta versão:
+   • JOÃO VITOR PEZZETE VALE:
+       STATUS:     DOCUMENTOS -> PRÉ-ANALISE RECUSADO
+       PENDENCIA:  AJUSTAR IRPF... -> AUMENTO DE CRÉDITO NÃO APROVADO...
+       PROX FUP:   2026-09-28 -> 2026-09-29
+       TAXA:       13,85% a.a. -> "" (sem taxa)
    ========================================================= */
 const CLIENTES = [
   { cpf: "296.674.778-19", nome: "Ricardo Lima Pereira", inicio: "2026-07-27",
@@ -602,11 +607,13 @@ const CLIENTES = [
     banco: "Banco Bradesco S.A.", proposta: "5499386", taxa_aprovada: "12% a.a.",
     finan_prop: 328000, finan_comp: 21400.00, servicos_doc: 32100.00 },
 
+  /* ▼▼▼ ATUALIZADO ▼▼▼ */
   { cpf: "443.125.978-39", nome: "João Vitor Pezzete Vale", inicio: "2026-09-21",
-    status: "DOCUMENTOS", corretor: "ASSESSORIA DIRETA",
-    pendencia: "AJUSTAR IRPF COMPROVAÇÃO DE RENDA", prox_fup: "2026-09-28",
-    prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
-    banco: "Banco Bradesco S.A.", proposta: "5540480", taxa_aprovada: "13,85% a.a.",
+    status: "PRÉ-ANALISE RECUSADO", corretor: "ASSESSORIA DIRETA",
+    pendencia: "AUMENTO DE CRÉDITO NÃO APROVADO, PODERÁ SER REENVIADO NOVA PROPOSTA COM DEFESA APÓS ABERTURA DA CONTA CORRENTE BRADESCO.",
+    prox_fup: "2026-09-29",
+    prev_conclusao: "EM PROCESSO INICIAL",
+    banco: "Banco Bradesco S.A.", proposta: "5540480", taxa_aprovada: "",
     finan_prop: 215000, finan_comp: 20000.00, servicos_doc: 32440.00 },
 
   { cpf: "371.005.628-48", nome: "Lorena Monique Vasconcelos da Silva", inicio: "2026-09-21",
@@ -804,7 +811,7 @@ function renderCliente(c) {
   const propZero  = !c.finan_prop   || Number(c.finan_prop) === 0;
   const compZero  = !c.finan_comp   || Number(c.finan_comp) === 0;
   const docZero   = !c.servicos_doc || Number(c.servicos_doc) === 0;
-  const taxaZero  = !c.taxa_aprovada || String(c.taxa_aprovada).trim() === "";
+  const taxaZero  = !c.taxa_aprovada || String(c.taxa_aprovada).trim() === "" || String(c.taxa_aprovada).trim() === "-";
 
   const bancoConfig = BANCOS_DOMINIOS[c.banco] || BANCOS_DOMINIOS["Em definição"];
   const temDominio  = !!bancoConfig.dominio;
