@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consulta de Processos - Rafael Oliveira</title>
+<style>
+  :root{
+    --brand-red: #C00000;
+    --brand-dark: #8B0000;
+    --bg-color: #F4F6F8;
+    --card: #FFFFFF;
+    --text-main: #1A1A1A;
+    --text-muted: #666666;
+    --line: #E2E8F0;
+    --ok: #059669;
+    --warn: #D97706;
+    --err: #DC2626;
+    --step-done: #C00000;
+    --step-current: #C00000;
+    --step-pending: #CBD5E1;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:32px 16px 60px;
+    color: var(--text-main);
+  }
+  .wrap{width:100%;max-width:760px;}
+
+  /* ---------- CABEÇALHO ---------- */
+  header {
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 5px solid var(--brand-red);
+  }
+  .logo-box {
+    width: 56px; height: 56px;
+    background-color: var(--brand-red);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 900; font-size: 2rem;
+    font-family: Arial, sans-serif;
+    flex-shrink: 0;
+    box-shadow: 0 4px 8px rgba(192, 0, 0, 0.3);
+  }
+  .header-text h1 {
+    margin: 0; font-size: 1.4rem;
+    letter-spacing: -0.5px; text-transform: uppercase;
+  }
+  .header-text p {
+    margin: 4px 0 0; font-size: 0.8rem;
+    font-weight: 600; color: var(--brand-red);
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+
+  /* ---------- CARD BUSCA ---------- */
+  .card{
+    background:var(--card); border-radius:16px;
+    padding:28px; box-shadow:0 10px 30px rgba(0,0,0,0.06);
+  }
+  label{
+    display:block; font-size:.8rem; font-weight:700;
+    color:var(--text-muted); text-transform:uppercase;
+    letter-spacing:.6px; margin-bottom:10px;
+  }
+  .search-row{display:flex;gap:12px;flex-wrap:wrap;}
+  input[type="text"]{
+    flex:1 1 220px; padding:15px 18px;
+    font-size:1.15rem; letter-spacing:1px;
+    border:2px solid var(--line); border-radius:10px;
+    outline:none; transition:.18s;
+    font-family:'Courier New',monospace; min-width:0;
+    background:#FAFAFA;
+  }
+  input[type="text"]:focus{
+    border-color:var(--brand-red);
+    box-shadow:0 0 0 4px rgba(192,0,0,0.12);
+    background:#FFF;
+  }
+  button{
+    padding:15px 28px; font-size:1rem; font-weight:700;
+    border:0; border-radius:10px;
+    background:var(--brand-red); color:#fff;
+    cursor:pointer; transition:.18s;
+    text-transform:uppercase; letter-spacing:.5px;
+  }
+  button:hover{background:var(--brand-dark);}
+  button:active{transform:translateY(1px);}
+  button.ghost{background:#F1F5F9;color:#334155;text-transform:none;}
+  button.ghost:hover{background:#E2E8F0;}
+  .hint{margin-top:12px;font-size:.78rem;color:var(--text-muted);}
+
+  /* ---------- RESULTADO ---------- */
+  #result{margin-top:28px;}
+  .empty-state{
+    text-align:center;padding:40px 12px;color:var(--text-muted);font-size:.95rem;
+  }
+  .empty-state .ico{font-size:2.8rem;display:block;margin-bottom:12px;opacity:.4;}
+
+  .alert{
+    border-radius:12px;padding:18px 20px;font-size:.95rem;font-weight:600;
+    display:flex;gap:12px;align-items:flex-start;
+  }
+  .alert.err{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;}
+
+  .person{
+    display:flex;align-items:center;gap:16px;
+    padding-bottom:20px;border-bottom:2px dashed var(--line);margin-bottom:20px;
+  }
+  .avatar{
+    width:56px;height:56px;border-radius:50%;
+    background:linear-gradient(135deg,var(--brand-red),#E53935);
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:1.25rem;flex:0 0 56px;
+    box-shadow:0 4px 8px rgba(192,0,0,0.2);
+  }
+  .person h2{margin:0;font-size:1.25rem;line-height:1.3;}
+  .person span{font-size:.85rem;color:var(--text-muted);font-family:'Courier New',monospace;}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media(max-width:560px){.grid{grid-template-columns:1fr;}}
+
+  .field{
+    background:#F8FAFC;border:1px solid var(--line);
+    border-radius:12px;padding:15px 16px;
+  }
+  .field.full{grid-column:1/-1;}
+  .field .k{
+    font-size:.7rem;font-weight:700;letter-spacing:.8px;
+    text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;
+  }
+  .field .v{font-size:1.05rem;font-weight:600;line-height:1.4;word-break:break-word;}
+
+  /* ============================================= */
+  /* RASTREADOR DE ETAPAS (STEPPER)                */
+  /* ============================================= */
+  .stepper-box{
+    margin-top:20px;
+    background:#FAFAFA;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:20px 18px 18px;
+  }
+  .stepper-title{
+    font-size:.72rem;
+    font-weight:700;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--text-muted);
+    margin-bottom:16px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .stepper-title::before{
+    content:"📊";
+    font-size:1rem;
+  }
+  .stepper-title .progress-info{
+    margin-left:auto;
+    font-size:.7rem;
+    color:var(--brand-red);
+    font-weight:800;
+    background:#FFF5F5;
+    padding:3px 10px;
+    border-radius:999px;
+    letter-spacing:.5px;
+  }
+
+  .stepper{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:0;
+    position:relative;
+  }
+  .step{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    position:relative;
+    min-width:0;
+  }
+
+  /* Linha de conexão entre as etapas */
+  .step:not(:last-child)::after{
+    content:"";
+    position:absolute;
+    top:16px;
+    left:calc(50% + 18px);
+    right:calc(-50% + 18px);
+    height:3px;
+    background:var(--step-pending);
+    z-index:0;
+    transition:.3s;
+  }
+  .step.done:not(:last-child)::after{background:var(--step-done);}
+  .step.current:not(:last-child)::after{
+    background:linear-gradient(to right, var(--step-done) 0%, var(--step-done) 50%, var(--step-pending) 50%, var(--step-pending) 100%);
+  }
+
+  .step-dot{
+    width:34px;height:34px;border-radius:50%;
+    background:#FFF;
+    border:3px solid var(--step-pending);
+    display:flex;align-items:center;justify-content:center;
+    font-size:.75rem;font-weight:800;
+    color:var(--step-pending);
+    z-index:1;position:relative;
+    transition:.25s;
+    flex-shrink:0;
+  }
+  .step-label{
+    margin-top:8px;
+    font-size:.62rem;
+    font-weight:700;
+    letter-spacing:.3px;
+    text-transform:uppercase;
+    color:var(--step-pending);
+    line-height:1.25;
+    transition:.25s;
+    padding:0 2px;
+    word-break:break-word;
+  }
+
+  /* Etapa CONCLUÍDA */
+  .step.done .step-dot{
+    background:var(--step-done);
+    border-color:var(--step-done);
+    color:#FFF;
+  }
+  .step.done .step-label{color:var(--brand-dark);}
+
+  /* Etapa ATUAL */
+  .step.current .step-dot{
+    background:#FFF;
+    border-color:var(--step-current);
+    color:var(--step-current);
+    transform:scale(1.15);
+    box-shadow:0 0 0 6px rgba(192,0,0,0.15);
+    animation:pulse 2s infinite;
+  }
+  .step.current .step-label{
+    color:var(--brand-red);
+    font-weight:800;
+  }
+  @keyframes pulse{
+    0%,100%{box-shadow:0 0 0 6px rgba(192,0,0,0.15);}
+    50%{box-shadow:0 0 0 11px rgba(192,0,0,0.06);}
+  }
+
+  /* Responsivo: mobile vira vertical */
+  @media(max-width:640px){
+    .stepper{
+      flex-direction:column;
+      gap:0;
+      padding-left:6px;
+    }
+    .step{
+      flex-direction:row;
+      align-items:center;
+      text-align:left;
+      gap:14px;
+      padding:8px 0;
+      width:100%;
+    }
+    .step:not(:last-child)::after{
+      top:calc(50% + 17px);
+      left:16px;
+      right:auto;
+      width:3px;
+      height:calc(100% - 34px);
+    }
+    .step-label{
+      margin-top:0;
+      font-size:.75rem;
+    }
+  }
+
+  /* ---------- OUTROS CAMPOS ---------- */
+  .badge{
+    display:inline-block;padding:6px 14px;border-radius:999px;
+    font-size:.78rem;font-weight:700;letter-spacing:.4px;
+    color:#fff;background:#64748B;
+  }
+  .b-finalizado{background:var(--ok);}
+  .b-documentos{background:#EA580C;}
+  .b-pre{background:#D97706;}
+  .b-juridica{background:#7C3AED;}
+  .b-registro{background:#2563EB;}
+  .b-assinatura{background:#0D9488;}
+  .b-vistoria{background:#0891B2;}
+
+  .pendencia{border-left:5px solid var(--warn);background:#FFFBEB;}
+  .pendencia .v{color:#92400E;font-weight:700;}
+
+  .prox-fup{border-left:5px solid var(--brand-red);background:#FFF5F5;}
+  .prox-fup .v{color:var(--brand-dark);font-weight:700;font-size:1.1rem;}
+
+  .previsao{border-left:5px solid #2563EB;background:#EFF6FF;}
+  .previsao .v{color:#1E3A8A;font-weight:600;}
+
+  /* ---------- CRÉDITOS ---------- */
+  .creditos{
+    margin-top:16px;border-radius:14px;padding:18px 20px;
+    background:#FFF5F5;border:1px solid #FECACA;
+  }
+  .creditos h3{
+    margin:0 0 14px;font-size:.75rem;letter-spacing:1px;
+    text-transform:uppercase;color:var(--brand-dark);
+    display:flex;align-items:center;gap:8px;
+  }
+  .creditos h3::before{content:"💰";font-size:1.1rem;}
+  .creditos-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:560px){.creditos-row{grid-template-columns:1fr;}}
+
+  .credito{
+    background:#FFFFFF;border:1px solid #FECACA;
+    border-radius:10px;padding:14px 16px;
+  }
+  .credito .k{
+    font-size:.68rem;font-weight:700;letter-spacing:.7px;
+    text-transform:uppercase;color:var(--brand-dark);
+    margin-bottom:8px;line-height:1.3;
+  }
+  .credito .v{
+    font-size:1.35rem;font-weight:800;color:var(--brand-red);
+    font-variant-numeric:tabular-nums;letter-spacing:.3px;
+  }
+  .credito .v.zero{color:#94A3B8;font-weight:700;font-size:1.15rem;}
+
+  .actions{margin-top:24px;display:flex;gap:12px;justify-content:flex-end;}
+
+  footer{
+    text-align:center;margin-top:32px;padding:16px;
+    background:var(--brand-red);color:#fff;border-radius:12px;
+    font-size:.8rem;font-weight:600;letter-spacing:.5px;
+    box-shadow:0 4px 10px rgba(192,0,0,0.2);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo-box">R</div>
+    <div class="header-text">
+      <h1>Rafael Oliveira</h1>
+      <p>Assessoria em Crédito Imobiliário</p>
+    </div>
+  </header>
+
+  <div class="card">
+    <label for="cpf">CPF do cliente</label>
+    <div class="search-row">
+      <input id="cpf" type="text" inputmode="numeric" placeholder="000.000.000-00" autocomplete="off" maxlength="14">
+      <button id="btnBuscar">Consultar</button>
+    </div>
+    <div class="hint">Pressione <strong>Enter</strong> para consultar • Somente números também funciona</div>
+
+    <div id="result">
+      <div class="empty-state">
+        <span class="ico">🔎</span>
+        Aguardando consulta...
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    SEGURANÇA • ATENDIMENTO PERSONALIZADO • AGILIDADE E TRANSPARÊNCIA
+  </footer>
+
+</div>
+
+<script>
+/* =========================================================
+   1) ORDEM DAS ETAPAS (fluxo do processo)
+   ========================================================= */
+const ETAPAS = [
+  "PRE-ANALISE",
+  "DOCUMENTOS",
+  "VISTORIA",
+  "ANALISE JURIDICA",
+  "ASSINATURA",
+  "EM REGISTRO",
+  "POS-VENDA",
+  "FINALIZADO"
+];
+
+/* =========================================================
+   2) BASE DE DADOS
+   ========================================================= */
+const CLIENTES = [
+  { cpf: "296.674.778-19", nome: "Ricardo Lima Pereira", inicio: "2026-07-27",
+    status: "FINALIZADO", corretor: "RAFAEL TADEU FERREIRA (SP)",
+    pendencia: "FINALIZADO", prox_fup: "", prev_conclusao: "CONCLUÍDO",
+    finan_prop: 398189, finan_comp: 29150.00 },
+
+  { cpf: "248.258.738-71", nome: "VALDINETE MOREIRA DA SILVA", inicio: "2026-03-06",
+    status: "EM REGISTRO", corretor: "ASSESSORIA DIRETA",
+    pendencia: "AGUARDANDO CAIXA PARA REGISTRO", prox_fup: "2029-09-30",
+    prev_conclusao: "2026-10-15", finan_prop: 120000, finan_comp: 0 },
+
+  { cpf: "294.743.988-01", nome: "ROBÉRIO DA SILVA", inicio: "2026-06-07",
+    status: "ANALISE JURIDICA", corretor: "ASSESSORIA DIRETA",
+    pendencia: "EM PROCESSAMENTO DE (IQ) QUITAÇÃO DE FINANCIAMENTO DO ANTIGO PROPRIETARIO",
+    prox_fup: "2026-09-30",
+    prev_conclusao: "AINDA EM FASE DE ANÁLISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    finan_prop: 230000, finan_comp: 0 },
+
+  { cpf: "502.146.518-00", nome: "MARIA LINA MORRONE SANTANA", inicio: "2026-07-27",
+    status: "PRE-ANALISE", corretor: "RAFAEL TADEU FERREIRA (SP)",
+    pendencia: "DEFINIÇÃO/ESCOLHA DOS IMÓVEIS", prox_fup: "2026-09-30",
+    prev_conclusao: "AINDA EM FASE DE ANÁLISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    finan_prop: 0, finan_comp: 0 },
+
+  { cpf: "456.499.138-89", nome: "Everson Lima Silva", inicio: "2026-02-05",
+    status: "ANALISE JURIDICA", corretor: "ASSESSORIA DIRETA",
+    pendencia: "EM EMISSÃO DE CERTIFICADO", prox_fup: "2026-09-30",
+    prev_conclusao: "AINDA EM FASE DE ANÁLISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    finan_prop: 386764, finan_comp: 26600.00 },
+
+  { cpf: "064.386.184-03", nome: "Edson Edis Pereira Monteiro", inicio: "2026-09-01",
+    status: "ASSINATURA", corretor: "ASSESSORIA DIRETA",
+    pendencia: "EM EMISSÃO DE CERTIFICADO", prox_fup: "2026-09-25",
+    prev_conclusao: "AINDA EM FASE DE ANÁLISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    finan_prop: 217875, finan_comp: 14525.00 },
+
+  { cpf: "170.740.178-09", nome: "KARINA ANTUNES LOPES SILVA", inicio: "2026-09-09",
+    status: "DOCUMENTOS", corretor: "RAFAEL TADEU FERREIRA (SP)",
+    pendencia: "ENVIADO A PROPOSTA E AGUARDANDO ACEITE", prox_fup: "2026-09-30",
+    prev_conclusao: "AINDA EM FASE DE ANÁLISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    finan_prop: 171758, finan_comp: 0 },
+
+  { cpf: "366.684.838-95", nome: "THIAGO ARAUJO TORRES", inicio: "2026-09-08",
+    status: "DOCUMENTOS", corretor: "ASSESSORIA DIRETA",
+    pendencia: "AJUSTAR IRPF COMPROVAÇÃO DE RENDA", prox_fup: "2026-09-24",
+    prev_conclusao: "AINDA EM FASE DE ANÁLISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    finan_prop: 328000, finan_comp: 21400.00 },
+
+  { cpf: "443.125.978-39", nome: "João Vitor Pezzete Vale", inicio: "2026-09-21",
+    status: "DOCUMENTOS", corretor: "ASSESSORIA DIRETA",
+    pendencia: "AJUSTAR IRPF COMPROVAÇÃO DE RENDA", prox_fup: "2026-09-28",
+    prev_conclusao: "AINDA EM FASE DE ANÁLISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    finan_prop: 215000, finan_comp: 20000.00 },
+
+  { cpf: "371.005.628-48", nome: "Lorena Monique Vasconcelos da Silva", inicio: "2026-09-21",
+    status: "PRE-ANALISE", corretor: "UILIAM SANTOS (SP)",
+    pendencia: "DEFINIÇÃO/ESCOLHA DOS IMÓVEIS", prox_fup: "2026-09-30",
+    prev_conclusao: "EM PROCESSO INICIAL",
+    finan_prop: 182833.92, finan_comp: 0 },
+
+  { cpf: "259.663.958-02", nome: "Luciara Oliveira da Cruz", inicio: "2026-09-25",
+    status: "PRE-ANALISE", corretor: "ALEXANDRE MARLI MORAES (SP)",
+    pendencia: "DEFINIÇÃO/ESCOLHA DOS IMÓVEIS", prox_fup: "2026-09-30",
+    prev_conclusao: "EM PROCESSO INICIAL",
+    finan_prop: 290000, finan_comp: 19750.00 }
+];
+
+/* =========================================================
+   3) UTILITÁRIOS
+   ========================================================= */
+const soDigitos = (v) => String(v || "").replace(/\D/g, "");
+
+function mascaraCPF(valor) {
+  const d = soDigitos(valor).slice(0, 11);
+  return d
+    .replace(/^(\d{3})(\d)/, "$1.$2")
+    .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+    .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+}
+
+function dataBR(iso) {
+  if (!iso) return "—";
+  if (/^\d{4}-\d{2}-\d{2}/.test(iso)) {
+    const [a, m, d] = String(iso).slice(0, 10).split("-");
+    return `${d}/${m}/${a}`;
+  }
+  return iso;
+}
+
+function moedaBR(v) {
+  const n = Number(v);
+  if (!isFinite(n)) return "—";
+  return n.toLocaleString("pt-BR", {
+    style: "currency", currency: "BRL",
+    minimumFractionDigits: 2, maximumFractionDigits: 2
+  });
+}
+
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g,
+  c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function classeStatus(status) {
+  const s = String(status).toUpperCase();
+  if (s.includes("FINALIZ") || s.includes("CONCLU")) return "b-finalizado";
+  if (s.includes("DOCUMENTO")) return "b-documentos";
+  if (s.includes("PRE")) return "b-pre";
+  if (s.includes("JURIDIC")) return "b-juridica";
+  if (s.includes("REGISTRO")) return "b-registro";
+  if (s.includes("ASSINATURA")) return "b-assinatura";
+  if (s.includes("VISTORIA")) return "b-vistoria";
+  return "";
+}
+
+function iniciais(nome) {
+  const p = String(nome).trim().split(/\s+/);
+  return ((p[0]?.[0] || "") + (p[1]?.[0] || "")).toUpperCase() || "?";
+}
+
+// Descobre em qual índice da ETAPAS o status se encontra
+function indiceEtapa(status) {
+  const s = String(status).toUpperCase().trim();
+  // Tratamento especial
+  if (s.includes("CONCLU") || s === "FINALIZADO") return ETAPAS.length - 1;
+  // Busca exata
+  const idx = ETAPAS.findIndex(e => e === s);
+  if (idx >= 0) return idx;
+  // Busca parcial (ex: "ANALISE JURIDICA" casa com "ANALISE JURIDICA")
+  const parcial = ETAPAS.findIndex(e => s.includes(e) || e.includes(s));
+  return parcial;
+}
+
+/* =========================================================
+   4) STEPPER (rastreador de etapas)
+   ========================================================= */
+function renderStepper(statusAtual) {
+  const idxAtual = indiceEtapa(statusAtual);
+  const total = ETAPAS.length;
+
+  // Se o status não bate com nenhuma etapa, não exibe o stepper
+  if (idxAtual < 0) return "";
+
+  const concluidas = idxAtual; // etapas antes da atual
+  const pct = Math.round(((idxAtual) / (total - 1)) * 100);
+
+  const steps = ETAPAS.map((etapa, i) => {
+    let cls = "step";
+    let conteudo = i + 1;
+    if (i < idxAtual) { cls += " done"; conteudo = "✓"; }
+    else if (i === idxAtual) { cls += " current"; conteudo = i + 1; }
+    const label = etapa === "PRE-ANALISE" ? "PRÉ-ANÁLISE"
+                : etapa === "ANALISE JURIDICA" ? "ANÁLISE JURÍDICA"
+                : etapa === "POS-VENDA" ? "PÓS-VENDA"
+                : etapa;
+    return `
+      <div class="${cls}">
+        <div class="step-dot">${conteudo}</div>
+        <div class="step-label">${esc(label)}</div>
+      </div>`;
+  }).join("");
+
+  return `
+    <div class="stepper-box">
+      <div class="stepper-title">
+        Progresso do processo
+        <span class="progress-info">${concluidas}/${total - 1} etapas</span>
+      </div>
+      <div class="stepper">${steps}</div>
+    </div>`;
+}
+
+/* =========================================================
+   5) BUSCA
+   ========================================================= */
+function buscarCPF(cpfDigitado) {
+  const alvo = soDigitos(cpfDigitado);
+  if (!alvo) return { erro: "Informe um CPF para consultar." };
+  if (alvo.length !== 11) return { erro: "CPF incompleto. Digite os 11 números." };
+
+  const achado = CLIENTES.find(c => soDigitos(c.cpf) === alvo);
+  if (!achado) return { erro: "CPF não encontrado na base de processos. Verifique o número digitado ou fale com o responsável." };
+
+  return { cliente: achado };
+}
+
+/* =========================================================
+   6) RENDERIZAÇÃO
+   ========================================================= */
+const elResult = document.getElementById("result");
+const elCpf    = document.getElementById("cpf");
+
+function renderErro(msg) {
+  elResult.innerHTML = `
+    <div class="alert err">
+      <span>⚠️</span>
+      <span>${esc(msg)}</span>
+    </div>`;
+}
+
+function renderCliente(c) {
+  const propZero = !c.finan_prop || Number(c.finan_prop) === 0;
+  const compZero = !c.finan_comp || Number(c.finan_comp) === 0;
+
+  elResult.innerHTML = `
+    <div class="person">
+      <div class="avatar">${esc(iniciais(c.nome))}</div>
+      <div>
+        <h2>${esc(c.nome)}</h2>
+        <span>CPF ${esc(c.cpf)}</span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="field">
+        <div class="k">Data de envio para aprovação</div>
+        <div class="v">${esc(dataBR(c.inicio))}</div>
+      </div>
+
+      <div class="field">
+        <div class="k">Status atual</div>
+        <div class="v">
+          <span class="badge ${classeStatus(c.status)}">${esc(c.status)}</span>
+        </div>
+      </div>
+
+      <div class="field full">
+        <div class="k">Corretor responsável</div>
+        <div class="v">${esc(c.corretor)}</div>
+      </div>
+
+      <div class="field full pendencia">
+        <div class="k">Tipo de pendência</div>
+        <div class="v">${esc(c.pendencia)}</div>
+      </div>
+
+      <div class="field full prox-fup">
+        <div class="k">📅 Próximo Follow-up</div>
+        <div class="v">${esc(dataBR(c.prox_fup))}</div>
+      </div>
+
+      <div class="field full previsao">
+        <div class="k">📋 Previsão de Término de Registro</div>
+        <div class="v">${esc(dataBR(c.prev_conclusao))}</div>
+      </div>
+    </div>
+
+    ${renderStepper(c.status)}
+
+    <div class="creditos">
+      <h3>Créditos aprovados</h3>
+      <div class="creditos-row">
+        <div class="credito">
+          <div class="k">Crédito aprovado a ser pago ao proprietário</div>
+          <div class="v ${propZero ? "zero" : ""}">${esc(moedaBR(c.finan_prop))}</div>
+        </div>
+        <div class="credito">
+          <div class="k">Crédito aprovado para reembolso da documentação</div>
+          <div class="v ${compZero ? "zero" : ""}">${esc(moedaBR(c.finan_comp))}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="ghost" id="btnNova">Nova consulta</button>
+    </div>
+  `;
+  document.getElementById("btnNova").addEventListener("click", () => {
+    elCpf.value = "";
+    elCpf.focus();
+    elResult.innerHTML = `<div class="empty-state"><span class="ico">🔎</span>Aguardando consulta...</div>`;
+  });
+}
+
+function executarBusca() {
+  const r = buscarCPF(elCpf.value);
+  if (r.erro) { renderErro(r.erro); return; }
+  renderCliente(r.cliente);
+}
+
+/* =========================================================
+   7) EVENTOS
+   ========================================================= */
+elCpf.addEventListener("input", (e) => { e.target.value = mascaraCPF(e.target.value); });
+
+elCpf.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") { e.preventDefault(); executarBusca(); }
+});
+
+document.getElementById("btnBuscar").addEventListener("click", executarBusca);
+
+elCpf.focus();
+</script>
+</body>
+</html>
