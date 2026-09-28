@@ -519,8 +519,9 @@ const FLUXO_RECUSADO = [
 /* =========================================================
    2) BASE DE DADOS — ATUALIZADA
    ---------------------------------------------------------
-   Fonte: CONTROLE PROCESSOS.xlsx → aba "CONTROLE"
-   Mudança: razão social completa dos bancos
+   Mudança nesta versão:
+   • THIAGO ARAUJO TORRES -> corretor alterado para
+     RAFAEL TADEU FERREIRA (SP)
    ========================================================= */
 const CLIENTES = [
   { cpf: "296.674.778-19", nome: "Ricardo Lima Pereira", inicio: "2026-07-27",
@@ -571,8 +572,9 @@ const CLIENTES = [
     banco: "Banco Inter S.A.", proposta: "",
     finan_prop: 171758, finan_comp: 0, servicos_doc: 25500.00 },
 
+  /* ▼▼▼ ATUALIZADO ▼▼▼ */
   { cpf: "366.684.838-95", nome: "THIAGO ARAUJO TORRES", inicio: "2026-09-08",
-    status: "DOCUMENTOS", corretor: "ASSESSORIA DIRETA",
+    status: "DOCUMENTOS", corretor: "RAFAEL TADEU FERREIRA (SP)",
     pendencia: "AJUSTAR IRPF COMPROVAÇÃO DE RENDA", prox_fup: "2026-09-24",
     prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
     banco: "Banco Bradesco S.A.", proposta: "5499386",
@@ -601,9 +603,7 @@ const CLIENTES = [
 ];
 
 /* =========================================================
-   3) MAPA DOS BANCOS (domínio + cor + inicial)
-   ---------------------------------------------------------
-   Chaves atualizadas com a razão social completa
+   3) MAPA DOS BANCOS
    ========================================================= */
 const BANCOS_DOMINIOS = {
   "Banco Inter S.A.":                    { dominio: "bancointer.com.br", cor: "#FF7A00", inicial: "I" },
