@@ -195,7 +195,6 @@
     letter-spacing:.3px;
   }
 
-  /* ---------- TAXA APROVADA (destaque verde) ---------- */
   .field.taxa{
     background:var(--tax-bg);
     border:1px solid var(--tax-border);
@@ -540,9 +539,7 @@ const FLUXO_RECUSADO = [
 ];
 
 /* =========================================================
-   2) BASE DE DADOS — SINCRONIZADA COM A PLANILHA
-   ---------------------------------------------------------
-   Novo campo: taxa_aprovada (TX_APROVADA)
+   2) BASE DE DADOS
    ========================================================= */
 const CLIENTES = [
   { cpf: "296.674.778-19", nome: "Ricardo Lima Pereira", inicio: "2026-07-27",
@@ -867,7 +864,6 @@ function renderCliente(c) {
         </div>
       </div>
 
-      <!-- NOVO CAMPO: TAXA APROVADA -->
       <div class="field full taxa">
         <div class="k">💹 Taxa de juros aprovada</div>
         <div class="v ${taxaZero ? "zero" : ""}">
@@ -914,7 +910,7 @@ function renderCliente(c) {
       <h3>Custo estimado da documentação</h3>
       <div class="custo-doc-row">
         <div class="custo-item">
-          <div class="k">Serviços / Documentação</div>
+          <div class="k">Documentação</div>
           <div class="v ${docZero ? "zero" : ""}">${esc(moedaBR(c.servicos_doc))}</div>
         </div>
         <div class="custo-item">
