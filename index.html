@@ -214,7 +214,8 @@
   }
 
   .stepper-box{
-    margin-top:20px;
+    margin-top:16px;
+    margin-bottom:16px;
     background:#FAFAFA;
     border:1px solid var(--line);
     border-radius:14px;
@@ -395,6 +396,36 @@
   .previsao{border-left:5px solid #2563EB;background:#EFF6FF;}
   .previsao .v{color:#1E3A8A;font-weight:600;}
 
+  /* ---------- CRÉDITOS APROVADOS ---------- */
+  .creditos{
+    margin-top:16px;border-radius:14px;padding:18px 20px;
+    background:#FFF5F5;border:1px solid #FECACA;
+  }
+  .creditos h3{
+    margin:0 0 14px;font-size:.75rem;letter-spacing:1px;
+    text-transform:uppercase;color:var(--brand-dark);
+    display:flex;align-items:center;gap:8px;
+  }
+  .creditos h3::before{content:"💰";font-size:1.1rem;}
+  .creditos-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:560px){.creditos-row{grid-template-columns:1fr;}}
+
+  .credito{
+    background:#FFFFFF;border:1px solid #FECACA;
+    border-radius:10px;padding:14px 16px;
+  }
+  .credito .k{
+    font-size:.68rem;font-weight:700;letter-spacing:.7px;
+    text-transform:uppercase;color:var(--brand-dark);
+    margin-bottom:8px;line-height:1.3;
+  }
+  .credito .v{
+    font-size:1.35rem;font-weight:800;color:var(--brand-red);
+    font-variant-numeric:tabular-nums;letter-spacing:.3px;
+  }
+  .credito .v.zero{color:#94A3B8;font-weight:700;font-size:1.15rem;}
+
+  /* ---------- CUSTO DOCUMENTAÇÃO ---------- */
   .custo-doc{
     margin-top:16px;
     border-radius:14px;
@@ -447,34 +478,6 @@
     opacity:.85;
     line-height:1.4;
   }
-
-  .creditos{
-    margin-top:16px;border-radius:14px;padding:18px 20px;
-    background:#FFF5F5;border:1px solid #FECACA;
-  }
-  .creditos h3{
-    margin:0 0 14px;font-size:.75rem;letter-spacing:1px;
-    text-transform:uppercase;color:var(--brand-dark);
-    display:flex;align-items:center;gap:8px;
-  }
-  .creditos h3::before{content:"💰";font-size:1.1rem;}
-  .creditos-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-  @media(max-width:560px){.creditos-row{grid-template-columns:1fr;}}
-
-  .credito{
-    background:#FFFFFF;border:1px solid #FECACA;
-    border-radius:10px;padding:14px 16px;
-  }
-  .credito .k{
-    font-size:.68rem;font-weight:700;letter-spacing:.7px;
-    text-transform:uppercase;color:var(--brand-dark);
-    margin-bottom:8px;line-height:1.3;
-  }
-  .credito .v{
-    font-size:1.35rem;font-weight:800;color:var(--brand-red);
-    font-variant-numeric:tabular-nums;letter-spacing:.3px;
-  }
-  .credito .v.zero{color:#94A3B8;font-weight:700;font-size:1.15rem;}
 
   .actions{margin-top:24px;display:flex;gap:12px;justify-content:flex-end;}
 
@@ -540,12 +543,6 @@ const FLUXO_RECUSADO = [
 
 /* =========================================================
    2) BASE DE DADOS
-   ---------------------------------------------------------
-   Última atualização:
-   • EDSON EDIS PEREIRA MONTEIRO
-       PENDENCIA: "EM EMISSÃO DE CERTIFICADO" ->
-                  "AGENDADO EMISSÃO DO CERTIFICADO DIGITAL..."
-       PROX FUP: 2026-09-25 -> 2026-10-01
    ========================================================= */
 const CLIENTES = [
   { cpf: "296.674.778-19", nome: "Ricardo Lima Pereira", inicio: "2026-07-27",
@@ -583,7 +580,6 @@ const CLIENTES = [
     banco: "Banco Inter S.A.", proposta: "5488151", taxa_aprovada: "9,99% a.a.",
     finan_prop: 386764, finan_comp: 26600.00, servicos_doc: 36495.20 },
 
-  /* ▼▼▼ ATUALIZADO ▼▼▼ */
   { cpf: "064.386.184-03", nome: "Edson Edis Pereira Monteiro", inicio: "2026-09-01",
     status: "ASSINATURA", corretor: "ASSESSORIA DIRETA",
     pendencia: "AGENDADO EMISSÃO DO CERTIFICADO DIGITAL DOS VENDEDORES DE FORMA PRESENCIAL PARA A DATA DO PROXIMO FOLLOW-UP PARA MELHOR IDENTIFICAÇÃO.",
@@ -832,6 +828,7 @@ function renderCliente(c) {
 
     <div class="grid">
 
+      <!-- 1) BANCO -->
       <div class="field">
         <div class="k">Banco</div>
         <div class="v value-with-logo">
@@ -863,6 +860,7 @@ function renderCliente(c) {
         </div>
       </div>
 
+      <!-- 2) Nº DA PROPOSTA -->
       <div class="field">
         <div class="k">Nº da proposta</div>
         <div class="v">
@@ -871,23 +869,49 @@ function renderCliente(c) {
             : `<span style="color:#94A3B8;font-weight:600;">Em definição</span>`}
         </div>
       </div>
+    </div>
 
-      <div class="field full taxa">
-        <div class="k">💹 Taxa de juros aprovada</div>
-        <div class="v ${taxaZero ? "zero" : ""}">
-          ${taxaZero ? "Aguardando aprovação" : esc(c.taxa_aprovada)}
-        </div>
-      </div>
+    <!-- 3) PROGRESSO DO PROCESSO -->
+    ${renderStepper(c.status)}
 
+    <div class="grid">
+      <!-- 4) DATA DE ENVIO -->
       <div class="field">
         <div class="k">Data de envio para aprovação</div>
         <div class="v">${esc(dataBR(c.inicio))}</div>
       </div>
 
+      <!-- 5) STATUS ATUAL -->
       <div class="field">
         <div class="k">Status atual</div>
         <div class="v">
           <span class="badge ${classeStatus(c.status)}">${esc(c.status)}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6) CRÉDITOS APROVADOS -->
+    <div class="creditos">
+      <h3>Créditos aprovados</h3>
+      <div class="creditos-row">
+        <div class="credito">
+          <div class="k">Crédito aprovado a ser pago ao proprietário</div>
+          <div class="v ${propZero ? "zero" : ""}">${esc(moedaBR(c.finan_prop))}</div>
+        </div>
+        <div class="credito">
+          <div class="k">Crédito aprovado para reembolso da documentação</div>
+          <div class="v ${compZero ? "zero" : ""}">${esc(moedaBR(c.finan_comp))}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEMAIS INFORMAÇÕES -->
+    <div class="grid" style="margin-top:16px;">
+
+      <div class="field full taxa">
+        <div class="k">💹 Taxa de juros aprovada</div>
+        <div class="v ${taxaZero ? "zero" : ""}">
+          ${taxaZero ? "Aguardando aprovação" : esc(c.taxa_aprovada)}
         </div>
       </div>
 
@@ -912,8 +936,7 @@ function renderCliente(c) {
       </div>
     </div>
 
-    ${renderStepper(c.status)}
-
+    <!-- CUSTO ESTIMADO DA DOCUMENTAÇÃO -->
     <div class="custo-doc">
       <h3>Custo estimado da documentação</h3>
       <div class="custo-doc-row">
@@ -931,20 +954,6 @@ function renderCliente(c) {
       <div class="obs">
         💡 Valor estimado com base no custo de serviços e documentação do seu processo.
         O valor final pode sofrer pequenas variações conforme as etapas avançam.
-      </div>
-    </div>
-
-    <div class="creditos">
-      <h3>Créditos aprovados</h3>
-      <div class="creditos-row">
-        <div class="credito">
-          <div class="k">Crédito aprovado a ser pago ao proprietário</div>
-          <div class="v ${propZero ? "zero" : ""}">${esc(moedaBR(c.finan_prop))}</div>
-        </div>
-        <div class="credito">
-          <div class="k">Crédito aprovado para reembolso da documentação</div>
-          <div class="v ${compZero ? "zero" : ""}">${esc(moedaBR(c.finan_comp))}</div>
-        </div>
       </div>
     </div>
 
