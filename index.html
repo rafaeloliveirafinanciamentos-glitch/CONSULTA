@@ -118,6 +118,7 @@
   }
   .alert.err{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;}
 
+  /* ---------- PERSON (nome + banco + logo) ---------- */
   .person{
     display:flex;align-items:center;gap:16px;
     padding-bottom:20px;border-bottom:2px dashed var(--line);margin-bottom:20px;
@@ -129,8 +130,49 @@
     font-weight:700;font-size:1.25rem;flex:0 0 56px;
     box-shadow:0 4px 8px rgba(192,0,0,0.2);
   }
-  .person h2{margin:0;font-size:1.25rem;line-height:1.3;}
-  .person span{font-size:.85rem;color:var(--text-muted);font-family:'Courier New',monospace;}
+  .person-info{flex:1;min-width:0;}
+  .person-info h2{margin:0;font-size:1.25rem;line-height:1.3;}
+  .person-info .sub{
+    display:flex;align-items:center;gap:8px;
+    margin-top:6px;flex-wrap:wrap;
+  }
+  .person-info .sub span{
+    font-size:.8rem;color:var(--text-muted);
+    font-family:'Courier New',monospace;
+  }
+  .bank-line{
+    display:flex;align-items:center;gap:10px;
+    margin-top:8px;
+  }
+  .bank-logo{
+    height:28px;width:auto;max-width:80px;
+    object-fit:contain;
+    border-radius:4px;
+    background:#fff;
+    padding:2px;
+    border:1px solid var(--line);
+    flex-shrink:0;
+  }
+  .bank-info{
+    display:flex;flex-direction:column;gap:1px;min-width:0;
+  }
+  .bank-info .bank-name{
+    font-size:.82rem;font-weight:700;
+    color:var(--text-main);
+    letter-spacing:.2px;
+  }
+  .bank-info .bank-prop{
+    font-size:.75rem;color:var(--text-muted);
+    font-family:'Courier New',monospace;
+  }
+  .bank-info .bank-prop strong{
+    color:var(--brand-red);
+    font-weight:800;
+  }
+  /* fallback se o logo não carregar */
+  .bank-logo.placeholder{
+    display:none;
+  }
 
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
   @media(max-width:560px){.grid{grid-template-columns:1fr;}}
@@ -328,7 +370,6 @@
   .previsao{border-left:5px solid #2563EB;background:#EFF6FF;}
   .previsao .v{color:#1E3A8A;font-weight:600;}
 
-  /* CUSTO ESTIMADO DA DOCUMENTAÇÃO (SERVIÇOS/DOC) */
   .custo-doc{
     margin-top:16px;
     border-radius:14px;
@@ -473,87 +514,109 @@ const FLUXO_RECUSADO = [
 ];
 
 /* =========================================================
-   2) BASE DE DADOS — ATUALIZADA
+   2) BASE DE DADOS
    ---------------------------------------------------------
    Fonte: CONTROLE PROCESSOS.xlsx → aba "CONTROLE"
-   Atualização desta versão:
-   • MARIA LINA MORRONE SANTANA:
-       CV         0 -> 630.000
-       FINAN_PROP 0 -> 470.000
-       FINAN_COMP 0 -> 31.500,00  (CV * 5%)
-       SERVICOS/DOC 0 -> 43.218,00 (CV * 6,86%)
+   Campos: banco, proposta, finan_prop, finan_comp, servicos_doc
    ========================================================= */
 const CLIENTES = [
   { cpf: "296.674.778-19", nome: "Ricardo Lima Pereira", inicio: "2026-07-27",
     status: "FINALIZADO", corretor: "RAFAEL TADEU FERREIRA (SP)",
     pendencia: "FINALIZADO", prox_fup: "", prev_conclusao: "CONCLUIDO",
+    banco: "Inter", proposta: "5396706",
     finan_prop: 398189, finan_comp: 29150.00, servicos_doc: 40168.70 },
 
   { cpf: "248.258.738-71", nome: "VALDINETE MOREIRA DA SILVA", inicio: "2026-03-06",
     status: "EM REGISTRO", corretor: "ASSESSORIA DIRETA",
     pendencia: "EM REGISTRO", prox_fup: "2029-09-30",
-    prev_conclusao: "2026-10-15", finan_prop: 120000, finan_comp: 0,
-    servicos_doc: 23361.90 },
+    prev_conclusao: "2026-10-15", banco: "Inter", proposta: "5295031",
+    finan_prop: 120000, finan_comp: 0, servicos_doc: 23361.90 },
 
   { cpf: "294.743.988-01", nome: "ROBÉRIO DA SILVA", inicio: "2026-06-07",
     status: "ANALISE JURIDICA", corretor: "ASSESSORIA DIRETA",
     pendencia: "EM PROCESSAMENTO DE (IQ) QUITAÇÃO DE FINANCIAMENTO DO ANTIGO PROPRIETARIO",
     prox_fup: "2026-09-30",
     prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    banco: "Itaú", proposta: "17169668",
     finan_prop: 230000, finan_comp: 0, servicos_doc: 41820.60 },
 
-  /* ▼▼▼ ATUALIZADO ▼▼▼ */
   { cpf: "502.146.518-00", nome: "MARIA LINA MORRONE SANTANA", inicio: "2026-07-27",
     status: "PRÉ-ANALISE APROVADO", corretor: "RAFAEL TADEU FERREIRA (SP)",
     pendencia: "DEFINIÇÃO/ESCOLHA DOS IMÓVEIS", prox_fup: "2026-09-30",
     prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    banco: "Itaú", proposta: "17485698",
     finan_prop: 470000, finan_comp: 31500.00, servicos_doc: 43218.00 },
 
   { cpf: "456.499.138-89", nome: "Everson Lima Silva", inicio: "2026-02-05",
     status: "ANALISE JURIDICA", corretor: "ASSESSORIA DIRETA",
     pendencia: "EM EMISSÃO DE CERTIFICADO", prox_fup: "2026-09-30",
     prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    banco: "Inter", proposta: "5488151",
     finan_prop: 386764, finan_comp: 26600.00, servicos_doc: 36495.20 },
 
   { cpf: "064.386.184-03", nome: "Edson Edis Pereira Monteiro", inicio: "2026-09-01",
     status: "ASSINATURA", corretor: "ASSESSORIA DIRETA",
     pendencia: "EM EMISSÃO DE CERTIFICADO", prox_fup: "2026-09-25",
     prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    banco: "Inter", proposta: "5519125",
     finan_prop: 217875, finan_comp: 14525.00, servicos_doc: 26428.30 },
 
   { cpf: "170.740.178-09", nome: "KARINA ANTUNES LOPES SILVA", inicio: "2026-09-09",
     status: "DOCUMENTOS", corretor: "RAFAEL TADEU FERREIRA (SP)",
     pendencia: "ENVIADO A PROPOSTA E AGUARDANDO ACEITE", prox_fup: "2026-09-30",
     prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    banco: "Inter", proposta: "",
     finan_prop: 171758, finan_comp: 0, servicos_doc: 25500.00 },
 
   { cpf: "366.684.838-95", nome: "THIAGO ARAUJO TORRES", inicio: "2026-09-08",
     status: "DOCUMENTOS", corretor: "ASSESSORIA DIRETA",
     pendencia: "AJUSTAR IRPF COMPROVAÇÃO DE RENDA", prox_fup: "2026-09-24",
     prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    banco: "Bradesco", proposta: "5499386",
     finan_prop: 328000, finan_comp: 21400.00, servicos_doc: 32100.00 },
 
   { cpf: "443.125.978-39", nome: "João Vitor Pezzete Vale", inicio: "2026-09-21",
     status: "DOCUMENTOS", corretor: "ASSESSORIA DIRETA",
     pendencia: "AJUSTAR IRPF COMPROVAÇÃO DE RENDA", prox_fup: "2026-09-28",
     prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    banco: "Bradesco", proposta: "5540480",
     finan_prop: 215000, finan_comp: 20000.00, servicos_doc: 32440.00 },
 
   { cpf: "371.005.628-48", nome: "Lorena Monique Vasconcelos da Silva", inicio: "2026-09-21",
     status: "PRÉ-ANALISE APROVADO", corretor: "UILIAM SANTOS (SP)",
     pendencia: "DEFINIÇÃO/ESCOLHA DOS IMÓVEIS", prox_fup: "2026-09-30",
     prev_conclusao: "EM PROCESSO INICIAL",
+    banco: "Caixa", proposta: "",
     finan_prop: 182833.92, finan_comp: 0, servicos_doc: 16464.00 },
 
   { cpf: "259.663.958-02", nome: "Luciara Oliveira da Cruz", inicio: "2026-09-25",
     status: "PRÉ-ANALISE APROVADO", corretor: "ALEXANDRE MARLI MORAES (SP)",
     pendencia: "DEFINIÇÃO/ESCOLHA DOS IMÓVEIS", prox_fup: "2026-09-30",
     prev_conclusao: "EM PROCESSO INICIAL",
+    banco: "Bradesco", proposta: "",
     finan_prop: 290000, finan_comp: 19750.00, servicos_doc: 27097.00 }
 ];
 
 /* =========================================================
-   3) UTILITÁRIOS
+   3) MAPA DE DOMÍNIOS DOS BANCOS (para carregar o logo)
+   ========================================================= */
+const BANCOS_DOMINIOS = {
+  "Inter": "bancointer.com.br",
+  "Itaú": "itau.com.br",
+  "Bradesco": "bradesco.com.br",
+  "Caixa": "caixa.gov.br",
+  "Santander": "santander.com.br",
+  "Em definição": ""
+};
+
+function logoBanco(nomeBanco) {
+  const dominio = BANCOS_DOMINIOS[nomeBanco];
+  if (!dominio) return "";
+  return `https://logo.clearbit.com/${dominio}`;
+}
+
+/* =========================================================
+   4) UTILITÁRIOS
    ========================================================= */
 const soDigitos = (v) => String(v || "").replace(/\D/g, "");
 
@@ -637,7 +700,7 @@ function resolverFluxo(status) {
 }
 
 /* =========================================================
-   4) STEPPER
+   5) STEPPER
    ========================================================= */
 function renderStepper(statusAtual) {
   const { fluxo, idx, recusado } = resolverFluxo(statusAtual);
@@ -687,7 +750,7 @@ function renderStepper(statusAtual) {
 }
 
 /* =========================================================
-   5) BUSCA
+   6) BUSCA
    ========================================================= */
 function buscarCPF(cpfDigitado) {
   const alvo = soDigitos(cpfDigitado);
@@ -701,7 +764,7 @@ function buscarCPF(cpfDigitado) {
 }
 
 /* =========================================================
-   6) RENDERIZAÇÃO
+   7) RENDERIZAÇÃO
    ========================================================= */
 const elResult = document.getElementById("result");
 const elCpf    = document.getElementById("cpf");
@@ -719,12 +782,29 @@ function renderCliente(c) {
   const compZero  = !c.finan_comp   || Number(c.finan_comp) === 0;
   const docZero   = !c.servicos_doc || Number(c.servicos_doc) === 0;
 
+  const logoSrc = logoBanco(c.banco);
+  const temLogo = !!logoSrc;
+  const temProposta = c.proposta && c.proposta.trim() !== "";
+
   elResult.innerHTML = `
     <div class="person">
       <div class="avatar">${esc(iniciais(c.nome))}</div>
-      <div>
+      <div class="person-info">
         <h2>${esc(c.nome)}</h2>
-        <span>CPF ${esc(c.cpf)}</span>
+        <div class="sub">
+          <span>CPF ${esc(c.cpf)}</span>
+        </div>
+
+        <!-- BANCO + PROPOSTA + LOGO -->
+        <div class="bank-line">
+          ${temLogo ? `<img class="bank-logo" src="${logoSrc}"
+                          alt="Logo ${esc(c.banco)}"
+                          onerror="this.style.display='none';this.nextElementSibling&&this.nextElementSibling.classList.add('placeholder')">` : ''}
+          <div class="bank-info">
+            <span class="bank-name">${esc(c.banco)}</span>
+            ${temProposta ? `<span class="bank-prop">Proposta Nº <strong>${esc(c.proposta)}</strong></span>` : `<span class="bank-prop">Proposta em definição</span>`}
+          </div>
+        </div>
       </div>
     </div>
 
@@ -764,7 +844,6 @@ function renderCliente(c) {
 
     ${renderStepper(c.status)}
 
-    <!-- ===== CUSTO ESTIMADO DA DOCUMENTAÇÃO (SERVIÇOS/DOC) ===== -->
     <div class="custo-doc">
       <h3>Custo estimado da documentação</h3>
       <div class="custo-doc-row">
@@ -817,7 +896,7 @@ function executarBusca() {
 }
 
 /* =========================================================
-   7) EVENTOS
+   8) EVENTOS
    ========================================================= */
 elCpf.addEventListener("input", (e) => { e.target.value = mascaraCPF(e.target.value); });
 
