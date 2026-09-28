@@ -19,6 +19,7 @@
     --step-done: #C00000;
     --step-current: #C00000;
     --step-pending: #CBD5E1;
+    --step-refused: #DC2626;
   }
   *{box-sizing:border-box;}
   body{
@@ -34,7 +35,6 @@
   }
   .wrap{width:100%;max-width:760px;}
 
-  /* ---------- CABEÇALHO ---------- */
   header {
     background: #FFFFFF;
     border-radius: 16px;
@@ -66,7 +66,6 @@
     letter-spacing: 0.5px; text-transform: uppercase;
   }
 
-  /* ---------- CARD BUSCA ---------- */
   .card{
     background:var(--card); border-radius:16px;
     padding:28px; box-shadow:0 10px 30px rgba(0,0,0,0.06);
@@ -103,7 +102,6 @@
   button.ghost:hover{background:#E2E8F0;}
   .hint{margin-top:12px;font-size:.78rem;color:var(--text-muted);}
 
-  /* ---------- RESULTADO ---------- */
   #result{margin-top:28px;}
   .empty-state{
     text-align:center;padding:40px 12px;color:var(--text-muted);font-size:.95rem;
@@ -144,9 +142,6 @@
   }
   .field .v{font-size:1.05rem;font-weight:600;line-height:1.4;word-break:break-word;}
 
-  /* ============================================= */
-  /* RASTREADOR DE ETAPAS (STEPPER)                */
-  /* ============================================= */
   .stepper-box{
     margin-top:20px;
     background:#FAFAFA;
@@ -164,6 +159,7 @@
     display:flex;
     align-items:center;
     gap:8px;
+    flex-wrap:wrap;
   }
   .stepper-title::before{
     content:"📊";
@@ -178,6 +174,10 @@
     padding:3px 10px;
     border-radius:999px;
     letter-spacing:.5px;
+  }
+  .stepper-title .progress-info.refused{
+    color:#fff;
+    background:var(--step-refused);
   }
 
   .stepper{
@@ -197,7 +197,6 @@
     min-width:0;
   }
 
-  /* Linha de conexão entre as etapas */
   .step:not(:last-child)::after{
     content:"";
     position:absolute;
@@ -227,7 +226,7 @@
   }
   .step-label{
     margin-top:8px;
-    font-size:.62rem;
+    font-size:.6rem;
     font-weight:700;
     letter-spacing:.3px;
     text-transform:uppercase;
@@ -238,7 +237,6 @@
     word-break:break-word;
   }
 
-  /* Etapa CONCLUÍDA */
   .step.done .step-dot{
     background:var(--step-done);
     border-color:var(--step-done);
@@ -246,7 +244,6 @@
   }
   .step.done .step-label{color:var(--brand-dark);}
 
-  /* Etapa ATUAL */
   .step.current .step-dot{
     background:#FFF;
     border-color:var(--step-current);
@@ -264,7 +261,19 @@
     50%{box-shadow:0 0 0 11px rgba(192,0,0,0.06);}
   }
 
-  /* Responsivo: mobile vira vertical */
+  .step.refused .step-dot{
+    background:var(--step-refused);
+    border-color:var(--step-refused);
+    color:#FFF;
+    transform:scale(1.15);
+    box-shadow:0 0 0 6px rgba(220,38,38,0.18);
+    animation:none;
+  }
+  .step.refused .step-label{
+    color:var(--step-refused);
+    font-weight:800;
+  }
+
   @media(max-width:640px){
     .stepper{
       flex-direction:column;
@@ -292,7 +301,6 @@
     }
   }
 
-  /* ---------- OUTROS CAMPOS ---------- */
   .badge{
     display:inline-block;padding:6px 14px;border-radius:999px;
     font-size:.78rem;font-weight:700;letter-spacing:.4px;
@@ -305,6 +313,7 @@
   .b-registro{background:#2563EB;}
   .b-assinatura{background:#0D9488;}
   .b-vistoria{background:#0891B2;}
+  .b-recusado{background:var(--step-refused);}
 
   .pendencia{border-left:5px solid var(--warn);background:#FFFBEB;}
   .pendencia .v{color:#92400E;font-weight:700;}
@@ -315,7 +324,6 @@
   .previsao{border-left:5px solid #2563EB;background:#EFF6FF;}
   .previsao .v{color:#1E3A8A;font-weight:600;}
 
-  /* ---------- CRÉDITOS ---------- */
   .creditos{
     margin-top:16px;border-radius:14px;padding:18px 20px;
     background:#FFF5F5;border:1px solid #FECACA;
@@ -389,10 +397,10 @@
 
 <script>
 /* =========================================================
-   1) ORDEM DAS ETAPAS (fluxo do processo)
+   1) FLUXOS DE ETAPAS
    ========================================================= */
-const ETAPAS = [
-  "PRE-ANALISE",
+const FLUXO_APROVADO = [
+  "PRÉ-ANALISE APROVADO",
   "DOCUMENTOS",
   "VISTORIA",
   "ANALISE JURIDICA",
@@ -402,61 +410,68 @@ const ETAPAS = [
   "FINALIZADO"
 ];
 
+const FLUXO_RECUSADO = [
+  "PRÉ-ANALISE RECUSADO"
+];
+
 /* =========================================================
-   2) BASE DE DADOS
+   2) BASE DE DADOS — ATUALIZADA
+   ---------------------------------------------------------
+   Fonte: CONTROLE PROCESSOS.xlsx → aba "CONTROLE"
+   Última atualização: dados conforme planilha mais recente
    ========================================================= */
 const CLIENTES = [
   { cpf: "296.674.778-19", nome: "Ricardo Lima Pereira", inicio: "2026-07-27",
     status: "FINALIZADO", corretor: "RAFAEL TADEU FERREIRA (SP)",
-    pendencia: "FINALIZADO", prox_fup: "", prev_conclusao: "CONCLUÍDO",
+    pendencia: "FINALIZADO", prox_fup: "", prev_conclusao: "CONCLUIDO",
     finan_prop: 398189, finan_comp: 29150.00 },
 
   { cpf: "248.258.738-71", nome: "VALDINETE MOREIRA DA SILVA", inicio: "2026-03-06",
     status: "EM REGISTRO", corretor: "ASSESSORIA DIRETA",
-    pendencia: "AGUARDANDO CAIXA PARA REGISTRO", prox_fup: "2029-09-30",
+    pendencia: "EM REGISTRO", prox_fup: "2029-09-30",
     prev_conclusao: "2026-10-15", finan_prop: 120000, finan_comp: 0 },
 
   { cpf: "294.743.988-01", nome: "ROBÉRIO DA SILVA", inicio: "2026-06-07",
     status: "ANALISE JURIDICA", corretor: "ASSESSORIA DIRETA",
     pendencia: "EM PROCESSAMENTO DE (IQ) QUITAÇÃO DE FINANCIAMENTO DO ANTIGO PROPRIETARIO",
     prox_fup: "2026-09-30",
-    prev_conclusao: "AINDA EM FASE DE ANÁLISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
     finan_prop: 230000, finan_comp: 0 },
 
   { cpf: "502.146.518-00", nome: "MARIA LINA MORRONE SANTANA", inicio: "2026-07-27",
-    status: "PRE-ANALISE", corretor: "RAFAEL TADEU FERREIRA (SP)",
+    status: "PRÉ-ANALISE APROVADO", corretor: "RAFAEL TADEU FERREIRA (SP)",
     pendencia: "DEFINIÇÃO/ESCOLHA DOS IMÓVEIS", prox_fup: "2026-09-30",
-    prev_conclusao: "AINDA EM FASE DE ANÁLISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
     finan_prop: 0, finan_comp: 0 },
 
   { cpf: "456.499.138-89", nome: "Everson Lima Silva", inicio: "2026-02-05",
     status: "ANALISE JURIDICA", corretor: "ASSESSORIA DIRETA",
     pendencia: "EM EMISSÃO DE CERTIFICADO", prox_fup: "2026-09-30",
-    prev_conclusao: "AINDA EM FASE DE ANÁLISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
     finan_prop: 386764, finan_comp: 26600.00 },
 
   { cpf: "064.386.184-03", nome: "Edson Edis Pereira Monteiro", inicio: "2026-09-01",
     status: "ASSINATURA", corretor: "ASSESSORIA DIRETA",
     pendencia: "EM EMISSÃO DE CERTIFICADO", prox_fup: "2026-09-25",
-    prev_conclusao: "AINDA EM FASE DE ANÁLISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
     finan_prop: 217875, finan_comp: 14525.00 },
 
   { cpf: "170.740.178-09", nome: "KARINA ANTUNES LOPES SILVA", inicio: "2026-09-09",
     status: "DOCUMENTOS", corretor: "RAFAEL TADEU FERREIRA (SP)",
     pendencia: "ENVIADO A PROPOSTA E AGUARDANDO ACEITE", prox_fup: "2026-09-30",
-    prev_conclusao: "AINDA EM FASE DE ANÁLISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
     finan_prop: 171758, finan_comp: 0 },
 
   { cpf: "366.684.838-95", nome: "THIAGO ARAUJO TORRES", inicio: "2026-09-08",
     status: "DOCUMENTOS", corretor: "ASSESSORIA DIRETA",
     pendencia: "AJUSTAR IRPF COMPROVAÇÃO DE RENDA", prox_fup: "2026-09-24",
-    prev_conclusao: "AINDA EM FASE DE ANÁLISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
     finan_prop: 328000, finan_comp: 21400.00 },
 
   { cpf: "443.125.978-39", nome: "João Vitor Pezzete Vale", inicio: "2026-09-21",
     status: "DOCUMENTOS", corretor: "ASSESSORIA DIRETA",
     pendencia: "AJUSTAR IRPF COMPROVAÇÃO DE RENDA", prox_fup: "2026-09-28",
-    prev_conclusao: "AINDA EM FASE DE ANÁLISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
+    prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
     finan_prop: 215000, finan_comp: 20000.00 },
 
   { cpf: "371.005.628-48", nome: "Lorena Monique Vasconcelos da Silva", inicio: "2026-09-21",
@@ -508,9 +523,10 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g,
 
 function classeStatus(status) {
   const s = String(status).toUpperCase();
+  if (s.includes("RECUS")) return "b-recusado";
   if (s.includes("FINALIZ") || s.includes("CONCLU")) return "b-finalizado";
   if (s.includes("DOCUMENTO")) return "b-documentos";
-  if (s.includes("PRE")) return "b-pre";
+  if (s.includes("PRE") || s.includes("PRÉ")) return "b-pre";
   if (s.includes("JURIDIC")) return "b-juridica";
   if (s.includes("REGISTRO")) return "b-registro";
   if (s.includes("ASSINATURA")) return "b-assinatura";
@@ -523,41 +539,63 @@ function iniciais(nome) {
   return ((p[0]?.[0] || "") + (p[1]?.[0] || "")).toUpperCase() || "?";
 }
 
-// Descobre em qual índice da ETAPAS o status se encontra
-function indiceEtapa(status) {
-  const s = String(status).toUpperCase().trim();
-  // Tratamento especial
-  if (s.includes("CONCLU") || s === "FINALIZADO") return ETAPAS.length - 1;
-  // Busca exata
-  const idx = ETAPAS.findIndex(e => e === s);
-  if (idx >= 0) return idx;
-  // Busca parcial (ex: "ANALISE JURIDICA" casa com "ANALISE JURIDICA")
-  const parcial = ETAPAS.findIndex(e => s.includes(e) || e.includes(s));
-  return parcial;
+function resolverFluxo(status) {
+  const s = String(status || "").toUpperCase().trim();
+
+  if (s.includes("RECUS")) {
+    return { fluxo: FLUXO_RECUSADO, idx: 0, recusado: true };
+  }
+
+  let idx = -1;
+
+  if (s.includes("FINALIZ") || s.includes("CONCLU")) {
+    idx = FLUXO_APROVADO.indexOf("FINALIZADO");
+  } else if (s.includes("POS-VENDA") || s.includes("PÓS-VENDA")) {
+    idx = FLUXO_APROVADO.indexOf("POS-VENDA");
+  } else if (s.includes("REGISTRO")) {
+    idx = FLUXO_APROVADO.indexOf("EM REGISTRO");
+  } else if (s.includes("ASSINATURA")) {
+    idx = FLUXO_APROVADO.indexOf("ASSINATURA");
+  } else if (s.includes("JURIDIC")) {
+    idx = FLUXO_APROVADO.indexOf("ANALISE JURIDICA");
+  } else if (s.includes("VISTORIA")) {
+    idx = FLUXO_APROVADO.indexOf("VISTORIA");
+  } else if (s.includes("DOCUMENTO")) {
+    idx = FLUXO_APROVADO.indexOf("DOCUMENTOS");
+  } else if (s.includes("PRE") || s.includes("PRÉ")) {
+    idx = 0;
+  }
+
+  if (idx < 0) idx = 0;
+
+  return { fluxo: FLUXO_APROVADO, idx, recusado: false };
 }
 
 /* =========================================================
-   4) STEPPER (rastreador de etapas)
+   4) STEPPER
    ========================================================= */
 function renderStepper(statusAtual) {
-  const idxAtual = indiceEtapa(statusAtual);
-  const total = ETAPAS.length;
+  const { fluxo, idx, recusado } = resolverFluxo(statusAtual);
+  const total = fluxo.length;
 
-  // Se o status não bate com nenhuma etapa, não exibe o stepper
-  if (idxAtual < 0) return "";
-
-  const concluidas = idxAtual; // etapas antes da atual
-  const pct = Math.round(((idxAtual) / (total - 1)) * 100);
-
-  const steps = ETAPAS.map((etapa, i) => {
+  const steps = fluxo.map((etapa, i) => {
     let cls = "step";
     let conteudo = i + 1;
-    if (i < idxAtual) { cls += " done"; conteudo = "✓"; }
-    else if (i === idxAtual) { cls += " current"; conteudo = i + 1; }
-    const label = etapa === "PRE-ANALISE" ? "PRÉ-ANÁLISE"
-                : etapa === "ANALISE JURIDICA" ? "ANÁLISE JURÍDICA"
-                : etapa === "POS-VENDA" ? "PÓS-VENDA"
-                : etapa;
+    let label = etapa;
+
+    if (recusado) {
+      cls += " refused";
+      conteudo = "✕";
+      label = "PRÉ-ANÁLISE RECUSADO";
+    } else {
+      if (i < idx) { cls += " done"; conteudo = "✓"; }
+      else if (i === idx) { cls += " current"; conteudo = i + 1; }
+
+      if (etapa === "PRÉ-ANALISE APROVADO") label = "PRÉ-ANÁLISE APROVADO";
+      else if (etapa === "ANALISE JURIDICA") label = "ANÁLISE JURÍDICA";
+      else if (etapa === "POS-VENDA") label = "PÓS-VENDA";
+    }
+
     return `
       <div class="${cls}">
         <div class="step-dot">${conteudo}</div>
@@ -565,11 +603,19 @@ function renderStepper(statusAtual) {
       </div>`;
   }).join("");
 
+  let progresso;
+  if (recusado) {
+    progresso = `<span class="progress-info refused">PRÉ-ANÁLISE RECUSADA</span>`;
+  } else {
+    const concluidas = idx;
+    progresso = `<span class="progress-info">${concluidas}/${total - 1} etapas</span>`;
+  }
+
   return `
     <div class="stepper-box">
       <div class="stepper-title">
         Progresso do processo
-        <span class="progress-info">${concluidas}/${total - 1} etapas</span>
+        ${progresso}
       </div>
       <div class="stepper">${steps}</div>
     </div>`;
