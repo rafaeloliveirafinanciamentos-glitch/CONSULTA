@@ -328,9 +328,7 @@
   .previsao{border-left:5px solid #2563EB;background:#EFF6FF;}
   .previsao .v{color:#1E3A8A;font-weight:600;}
 
-  /* ============================================= */
   /* CUSTO ESTIMADO DA DOCUMENTAÇÃO (SERVIÇOS/DOC) */
-  /* ============================================= */
   .custo-doc{
     margin-top:16px;
     border-radius:14px;
@@ -475,11 +473,15 @@ const FLUXO_RECUSADO = [
 ];
 
 /* =========================================================
-   2) BASE DE DADOS
+   2) BASE DE DADOS — ATUALIZADA
    ---------------------------------------------------------
    Fonte: CONTROLE PROCESSOS.xlsx → aba "CONTROLE"
-   Campo servicos_doc = coluna SERVIÇOS/DOC
-   (fórmula: (CV * %DOC) + COMISSÃO)
+   Atualização desta versão:
+   • MARIA LINA MORRONE SANTANA:
+       CV         0 -> 630.000
+       FINAN_PROP 0 -> 470.000
+       FINAN_COMP 0 -> 31.500,00  (CV * 5%)
+       SERVICOS/DOC 0 -> 43.218,00 (CV * 6,86%)
    ========================================================= */
 const CLIENTES = [
   { cpf: "296.674.778-19", nome: "Ricardo Lima Pereira", inicio: "2026-07-27",
@@ -500,11 +502,12 @@ const CLIENTES = [
     prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
     finan_prop: 230000, finan_comp: 0, servicos_doc: 41820.60 },
 
+  /* ▼▼▼ ATUALIZADO ▼▼▼ */
   { cpf: "502.146.518-00", nome: "MARIA LINA MORRONE SANTANA", inicio: "2026-07-27",
     status: "PRÉ-ANALISE APROVADO", corretor: "RAFAEL TADEU FERREIRA (SP)",
     pendencia: "DEFINIÇÃO/ESCOLHA DOS IMÓVEIS", prox_fup: "2026-09-30",
     prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
-    finan_prop: 0, finan_comp: 0, servicos_doc: 0 },
+    finan_prop: 470000, finan_comp: 31500.00, servicos_doc: 43218.00 },
 
   { cpf: "456.499.138-89", nome: "Everson Lima Silva", inicio: "2026-02-05",
     status: "ANALISE JURIDICA", corretor: "ASSESSORIA DIRETA",
