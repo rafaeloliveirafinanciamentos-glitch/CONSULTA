@@ -24,6 +24,10 @@
     --cost-border: #FDE68A;
     --cost-text: #92400E;
     --cost-value: #B45309;
+    --tax-bg: #ECFDF5;
+    --tax-border: #A7F3D0;
+    --tax-text: #065F46;
+    --tax-value: #047857;
   }
   *{box-sizing:border-box;}
   body{
@@ -189,6 +193,25 @@
     font-weight:800;
     font-family:'Courier New',monospace;
     letter-spacing:.3px;
+  }
+
+  /* ---------- TAXA APROVADA (destaque verde) ---------- */
+  .field.taxa{
+    background:var(--tax-bg);
+    border:1px solid var(--tax-border);
+  }
+  .field.taxa .k{color:var(--tax-text);}
+  .field.taxa .v{
+    font-size:1.25rem;
+    font-weight:800;
+    color:var(--tax-value);
+    font-variant-numeric:tabular-nums;
+    letter-spacing:.3px;
+  }
+  .field.taxa .v.zero{
+    color:#94A3B8;
+    font-weight:700;
+    font-size:1.05rem;
   }
 
   .stepper-box{
@@ -518,18 +541,21 @@ const FLUXO_RECUSADO = [
 
 /* =========================================================
    2) BASE DE DADOS — SINCRONIZADA COM A PLANILHA
+   ---------------------------------------------------------
+   Novo campo: taxa_aprovada (TX_APROVADA)
    ========================================================= */
 const CLIENTES = [
   { cpf: "296.674.778-19", nome: "Ricardo Lima Pereira", inicio: "2026-07-27",
     status: "FINALIZADO", corretor: "RAFAEL TADEU FERREIRA (SP)",
     pendencia: "FINALIZADO", prox_fup: "", prev_conclusao: "CONCLUIDO",
-    banco: "Banco Inter S.A.", proposta: "5396706",
+    banco: "Banco Inter S.A.", proposta: "5396706", taxa_aprovada: "9,99% a.a.",
     finan_prop: 398189, finan_comp: 29150.00, servicos_doc: 40168.70 },
 
   { cpf: "248.258.738-71", nome: "VALDINETE MOREIRA DA SILVA", inicio: "2026-03-06",
     status: "EM REGISTRO", corretor: "ASSESSORIA DIRETA",
     pendencia: "EM REGISTRO", prox_fup: "2029-09-30",
     prev_conclusao: "2026-10-15", banco: "Banco Inter S.A.", proposta: "5295031",
+    taxa_aprovada: "9,99% a.a.",
     finan_prop: 120000, finan_comp: 0, servicos_doc: 23361.90 },
 
   { cpf: "294.743.988-01", nome: "ROBÉRIO DA SILVA", inicio: "2026-06-07",
@@ -537,63 +563,63 @@ const CLIENTES = [
     pendencia: "EM PROCESSAMENTO DE (IQ) QUITAÇÃO DE FINANCIAMENTO DO ANTIGO PROPRIETARIO",
     prox_fup: "2026-09-30",
     prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
-    banco: "Banco Itaú Unibanco S.A.", proposta: "17169668",
+    banco: "Banco Itaú Unibanco S.A.", proposta: "17169668", taxa_aprovada: "13,45% a.a.",
     finan_prop: 230000, finan_comp: 0, servicos_doc: 41820.60 },
 
   { cpf: "502.146.518-00", nome: "MARIA LINA MORRONE SANTANA", inicio: "2026-07-27",
     status: "PRÉ-ANALISE APROVADO", corretor: "RAFAEL TADEU FERREIRA (SP)",
     pendencia: "DEFINIÇÃO/ESCOLHA DOS IMÓVEIS", prox_fup: "2026-09-30",
     prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
-    banco: "Banco Itaú Unibanco S.A.", proposta: "17485698",
+    banco: "Banco Inter S.A.", proposta: "17485698", taxa_aprovada: "9,99% a.a.",
     finan_prop: 470000, finan_comp: 31500.00, servicos_doc: 43218.00 },
 
   { cpf: "456.499.138-89", nome: "Everson Lima Silva", inicio: "2026-02-05",
     status: "ANALISE JURIDICA", corretor: "ASSESSORIA DIRETA",
     pendencia: "EM EMISSÃO DE CERTIFICADO", prox_fup: "2026-09-30",
     prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
-    banco: "Banco Inter S.A.", proposta: "5488151",
+    banco: "Banco Inter S.A.", proposta: "5488151", taxa_aprovada: "9,99% a.a.",
     finan_prop: 386764, finan_comp: 26600.00, servicos_doc: 36495.20 },
 
   { cpf: "064.386.184-03", nome: "Edson Edis Pereira Monteiro", inicio: "2026-09-01",
     status: "ASSINATURA", corretor: "ASSESSORIA DIRETA",
     pendencia: "EM EMISSÃO DE CERTIFICADO", prox_fup: "2026-09-25",
     prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
-    banco: "Banco Inter S.A.", proposta: "5519125",
+    banco: "Banco Inter S.A.", proposta: "5519125", taxa_aprovada: "9,99% a.a.",
     finan_prop: 217875, finan_comp: 14525.00, servicos_doc: 26428.30 },
 
   { cpf: "170.740.178-09", nome: "KARINA ANTUNES LOPES SILVA", inicio: "2026-09-09",
     status: "DOCUMENTOS", corretor: "RAFAEL TADEU FERREIRA (SP)",
     pendencia: "ENVIADO A PROPOSTA E AGUARDANDO ACEITE", prox_fup: "2026-09-30",
     prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
-    banco: "Banco Inter S.A.", proposta: "",
+    banco: "Banco Inter S.A.", proposta: "", taxa_aprovada: "9,99% a.a.",
     finan_prop: 171758, finan_comp: 0, servicos_doc: 25500.00 },
 
   { cpf: "366.684.838-95", nome: "THIAGO ARAUJO TORRES", inicio: "2026-09-08",
     status: "DOCUMENTOS", corretor: "RAFAEL TADEU FERREIRA (SP)",
     pendencia: "AJUSTAR IRPF COMPROVAÇÃO DE RENDA", prox_fup: "2026-09-28",
     prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
-    banco: "Banco Bradesco S.A.", proposta: "5499386",
+    banco: "Banco Bradesco S.A.", proposta: "5499386", taxa_aprovada: "12% a.a.",
     finan_prop: 328000, finan_comp: 21400.00, servicos_doc: 32100.00 },
 
   { cpf: "443.125.978-39", nome: "João Vitor Pezzete Vale", inicio: "2026-09-21",
     status: "DOCUMENTOS", corretor: "ASSESSORIA DIRETA",
     pendencia: "AJUSTAR IRPF COMPROVAÇÃO DE RENDA", prox_fup: "2026-09-28",
     prev_conclusao: "AINDA EM FASE DE ANALISE JURIDICA, APÓS ESTA ETAPA SERÁ INICIADO O REGISTRO COM PREVISÃO DE 20 DIAS PARA CONCLUSÃO",
-    banco: "Banco Bradesco S.A.", proposta: "5540480",
+    banco: "Banco Bradesco S.A.", proposta: "5540480", taxa_aprovada: "13,85% a.a.",
     finan_prop: 215000, finan_comp: 20000.00, servicos_doc: 32440.00 },
 
   { cpf: "371.005.628-48", nome: "Lorena Monique Vasconcelos da Silva", inicio: "2026-09-21",
     status: "PRÉ-ANALISE APROVADO", corretor: "UILIAM SANTOS (SP)",
     pendencia: "DEFINIÇÃO/ESCOLHA DOS IMÓVEIS", prox_fup: "2026-09-30",
     prev_conclusao: "EM PROCESSO INICIAL",
-    banco: "Banco Caixa Econômica Federal", proposta: "",
+    banco: "Banco Caixa Econômica Federal", proposta: "", taxa_aprovada: "6,70% a.a.",
     finan_prop: 182833.92, finan_comp: 0, servicos_doc: 16464.00 },
 
   { cpf: "259.663.958-02", nome: "Luciara Oliveira da Cruz", inicio: "2026-09-25",
     status: "PRÉ-ANALISE APROVADO", corretor: "ALEXANDRE MARLI MORAES (SP)",
     pendencia: "DEFINIÇÃO/ESCOLHA DOS IMÓVEIS", prox_fup: "2026-09-30",
     prev_conclusao: "EM PROCESSO INICIAL",
-    banco: "Banco Bradesco S.A.", proposta: "",
+    banco: "Banco Bradesco S.A.", proposta: "", taxa_aprovada: "13,85% a.a.",
     finan_prop: 290000, finan_comp: 19750.00, servicos_doc: 27097.00 }
 ];
 
@@ -777,6 +803,7 @@ function renderCliente(c) {
   const propZero  = !c.finan_prop   || Number(c.finan_prop) === 0;
   const compZero  = !c.finan_comp   || Number(c.finan_comp) === 0;
   const docZero   = !c.servicos_doc || Number(c.servicos_doc) === 0;
+  const taxaZero  = !c.taxa_aprovada || String(c.taxa_aprovada).trim() === "";
 
   const bancoConfig = BANCOS_DOMINIOS[c.banco] || BANCOS_DOMINIOS["Em definição"];
   const temDominio  = !!bancoConfig.dominio;
@@ -837,6 +864,14 @@ function renderCliente(c) {
           ${temProposta
             ? `<span class="prop-num">${esc(c.proposta)}</span>`
             : `<span style="color:#94A3B8;font-weight:600;">Em definição</span>`}
+        </div>
+      </div>
+
+      <!-- NOVO CAMPO: TAXA APROVADA -->
+      <div class="field full taxa">
+        <div class="k">💹 Taxa de juros aprovada</div>
+        <div class="v ${taxaZero ? "zero" : ""}">
+          ${taxaZero ? "Aguardando aprovação" : esc(c.taxa_aprovada)}
         </div>
       </div>
 
