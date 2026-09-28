@@ -118,9 +118,9 @@
   }
   .alert.err{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;}
 
-  /* ---------- PERSON (nome + banco + logo) ---------- */
+  /* ---------- PERSON (nome + CPF) ---------- */
   .person{
-    display:flex;align-items:flex-start;gap:16px;
+    display:flex;align-items:center;gap:16px;
     padding-bottom:20px;border-bottom:2px dashed var(--line);margin-bottom:20px;
   }
   .avatar{
@@ -129,78 +129,16 @@
     color:#fff;display:flex;align-items:center;justify-content:center;
     font-weight:700;font-size:1.25rem;flex:0 0 56px;
     box-shadow:0 4px 8px rgba(192,0,0,0.2);
-    margin-top:4px;
   }
   .person-info{flex:1;min-width:0;}
   .person-info h2{margin:0;font-size:1.25rem;line-height:1.3;}
-  .person-info .sub{
-    display:flex;align-items:center;gap:8px;
-    margin-top:4px;flex-wrap:wrap;
-  }
-  .person-info .sub span{
-    font-size:.82rem;color:var(--text-muted);
+  .person-info span{
+    font-size:.85rem;color:var(--text-muted);
     font-family:'Courier New',monospace;
+    display:block;margin-top:4px;
   }
 
-  /* ---------- LINHA DO BANCO ---------- */
-  .bank-line{
-    display:flex;align-items:center;gap:14px;
-    margin-top:14px;
-    padding:10px 14px;
-    background:#F8FAFC;
-    border:1px solid var(--line);
-    border-radius:12px;
-  }
-  .bank-logo-wrap{
-    width:48px;height:48px;flex:0 0 48px;
-    border-radius:10px;
-    background:#fff;
-    border:1px solid var(--line);
-    display:flex;align-items:center;justify-content:center;
-    overflow:hidden;
-    position:relative;
-  }
-  .bank-logo{
-    width:100%;height:100%;
-    object-fit:contain;
-    padding:4px;
-    display:block;
-  }
-  .bank-logo.hidden{display:none;}
-  .bank-fallback{
-    width:100%;height:100%;
-    display:none;
-    align-items:center;justify-content:center;
-    color:#fff;
-    font-weight:900;
-    font-size:1.35rem;
-    font-family:Arial, sans-serif;
-    letter-spacing:-0.5px;
-  }
-  .bank-fallback.show{display:flex;}
-
-  .bank-info{
-    display:flex;flex-direction:column;gap:2px;min-width:0;
-  }
-  .bank-info .bank-name{
-    font-size:1.05rem;
-    font-weight:800;
-    color:var(--text-main);
-    letter-spacing:.2px;
-    line-height:1.2;
-  }
-  .bank-info .bank-prop{
-    font-size:.92rem;
-    color:var(--text-muted);
-    font-family:'Courier New',monospace;
-    line-height:1.3;
-  }
-  .bank-info .bank-prop strong{
-    color:var(--brand-red);
-    font-weight:800;
-    font-size:.98rem;
-  }
-
+  /* ---------- GRID ---------- */
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
   @media(max-width:560px){.grid{grid-template-columns:1fr;}}
 
@@ -213,8 +151,51 @@
     font-size:.7rem;font-weight:700;letter-spacing:.8px;
     text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;
   }
-  .field .v{font-size:1.05rem;font-weight:600;line-height:1.4;word-break:break-word;}
+  .field .v{
+    font-size:1.05rem;font-weight:600;line-height:1.4;
+    word-break:break-word;
+  }
 
+  /* Valor com logo ao lado (usado no campo BANCO) */
+  .value-with-logo{
+    display:flex;align-items:center;gap:10px;
+  }
+  .bank-logo-wrap{
+    width:32px;height:32px;flex:0 0 32px;
+    border-radius:8px;
+    background:#fff;
+    border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    overflow:hidden;
+    position:relative;
+  }
+  .bank-logo{
+    width:100%;height:100%;
+    object-fit:contain;
+    padding:2px;
+    display:block;
+  }
+  .bank-logo.hidden{display:none;}
+  .bank-fallback{
+    width:100%;height:100%;
+    display:none;
+    align-items:center;justify-content:center;
+    color:#fff;
+    font-weight:900;
+    font-size:1rem;
+    font-family:Arial, sans-serif;
+  }
+  .bank-fallback.show{display:flex;}
+
+  /* Destaque para o número da proposta */
+  .field .v .prop-num{
+    color:var(--brand-red);
+    font-weight:800;
+    font-family:'Courier New',monospace;
+    letter-spacing:.3px;
+  }
+
+  /* ---------- STEPPER ---------- */
   .stepper-box{
     margin-top:20px;
     background:#FAFAFA;
@@ -787,7 +768,6 @@ function buscarCPF(cpfDigitado) {
 const elResult = document.getElementById("result");
 const elCpf    = document.getElementById("cpf");
 
-// Contador único para evitar conflito de IDs de imagem entre buscas
 let imgUid = 0;
 
 function renderErro(msg) {
@@ -807,12 +787,10 @@ function renderCliente(c) {
   const temDominio  = !!bancoConfig.dominio;
   const temProposta = c.proposta && String(c.proposta).trim() !== "";
 
-  // Gera um id único para o par imagem/fallback
   const uid = ++imgUid;
   const idImg      = `bankLogo${uid}`;
   const idFallback = `bankFallback${uid}`;
 
-  // Fonte primária: Clearbit. Secundária: Google Favicons (mais confiável em alguns ambientes).
   const srcClearbit = temDominio ? `https://logo.clearbit.com/${bancoConfig.dominio}` : "";
   const srcGoogle   = temDominio ? `https://www.google.com/s2/favicons?domain=${bancoConfig.dominio}&sz=128` : "";
 
@@ -821,12 +799,16 @@ function renderCliente(c) {
       <div class="avatar">${esc(iniciais(c.nome))}</div>
       <div class="person-info">
         <h2>${esc(c.nome)}</h2>
-        <div class="sub">
-          <span>CPF ${esc(c.cpf)}</span>
-        </div>
+        <span>CPF ${esc(c.cpf)}</span>
+      </div>
+    </div>
 
-        <!-- BANCO + PROPOSTA + LOGO -->
-        <div class="bank-line">
+    <div class="grid">
+
+      <!-- BANCO (com logo ao lado) -->
+      <div class="field">
+        <div class="k">Banco</div>
+        <div class="v value-with-logo">
           <div class="bank-logo-wrap">
             <img id="${idImg}"
                  class="bank-logo"
@@ -851,18 +833,20 @@ function renderCliente(c) {
               ${esc(bancoConfig.inicial)}
             </div>
           </div>
-
-          <div class="bank-info">
-            <span class="bank-name">${esc(c.banco)}</span>
-            ${temProposta
-              ? `<span class="bank-prop">Proposta Nº <strong>${esc(c.proposta)}</strong></span>`
-              : `<span class="bank-prop">Proposta em definição</span>`}
-          </div>
+          <span>${esc(c.banco)}</span>
         </div>
       </div>
-    </div>
 
-    <div class="grid">
+      <!-- Nº DA PROPOSTA -->
+      <div class="field">
+        <div class="k">Nº da proposta</div>
+        <div class="v">
+          ${temProposta
+            ? `<span class="prop-num">${esc(c.proposta)}</span>`
+            : `<span style="color:#94A3B8;font-weight:600;">Em definição</span>`}
+        </div>
+      </div>
+
       <div class="field">
         <div class="k">Data de envio para aprovação</div>
         <div class="v">${esc(dataBR(c.inicio))}</div>
@@ -937,7 +921,6 @@ function renderCliente(c) {
     </div>
   `;
 
-  // Se não houver domínio, já mostra o fallback direto
   if (!temDominio) {
     const img = document.getElementById(idImg);
     const fb  = document.getElementById(idFallback);
